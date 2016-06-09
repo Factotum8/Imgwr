@@ -29,20 +29,23 @@ int main (){
     list= str.filter(rx);//"[0-9]+");
     QStringList abc;
     for (int i=0; i< list.size(); i++){
-        QRegExp xr("(\\d+)");
+        QRegExp RX("(\\d+)");
         int pos=0;
         cout<<list.at(i).toStdString()<<"\n";
         // = list.at(i);
 
-        while ((pos = rx.indexIn(list.at(i), pos)) != -1) {
-                  abc<<xr.cap(1);
-                  pos += rx.matchedLength();
+        while ((pos = RX.indexIn(list.at(i), pos)) != -1) {
+                  abc<<RX.cap(1);
+                  pos += RX.matchedLength();
         }
 
     }
+     cout<<"ABC\n";
+    for (int i=0; i< abc.size(); i++){
 
-    cout<<"ABC\n"<<abc.at(1).toStdString()<<"\n";
+       cout<<abc.at(i).toStdString()<<"\n";
 
+    }
    /* QString st = list.last();
     cout<<st.toStdString()<<"\n";
     st= list.first();
