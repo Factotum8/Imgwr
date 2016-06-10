@@ -4,4 +4,4 @@ HEADERS += \
 SOURCES += \
     main.cpp
 
-QT += core
+#QT += core

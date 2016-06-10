@@ -7,6 +7,9 @@
 #include <QStringList>
 #include <QString>
 
+//#include <QApplication>
+#include <QImage>
+#include <QPixmap>
 
 //#include <QFileDialog>
 using namespace std; //std::cout;
