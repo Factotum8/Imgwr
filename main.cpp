@@ -1,8 +1,12 @@
 #include "main.h"
 
+double mid=0, stdev=0;
 
-int main (){
+int k=0;
 
+int main (int argc, char** argv){
+
+    QApplication app(argc, argv);
     QFile fileIn("flow"),fileOut("IMG");
 
     if (!fileIn.open(QIODevice::ReadOnly)) {
@@ -34,37 +38,68 @@ int main (){
 
     }
 
-    int k= abc.size(),values [k];
+    k= abc.size();
+    int values [k];
 
-    cout<<"ABC\n";
+    //cout<<"ABC\n";
     for (int i=0; i< abc.size(); i++){
 
         values [i]=abc.at(i).toInt();
-        cout<<values[i]<<"\n";
+        //qDebug()<<values[i];
     }
 
-    int width=500, height=k/width;
+    int width=100, height=k/width;
 
     QImage image1 (width, height, QImage::Format_ARGB32);
     QImage image2 (width, height, QImage::Format_RGB16);
     QImage image3 (width, height, QImage::Format_Mono);
+  //  QImage image4 (width, height, QImage::Format_);
 
+    //qDebug()<<"\nwidth="<<width<<" height="<<height<<" k="<<k;
     for (int y = 0; y < height; y++) {
            for (int x = 0; x < width-2; x++) {
                QRgb argb = qRgb( values[x+y],  // red
                                  values[x+y+1],  // green
-                                 values[x+y+2]; // blue
+                                 values[x+y+2]); // blue
+               //qDebug()<<"\nx="<<x<<" y="<<y<<values[x+y]<< values[x+y+1]<<values[x+y+2]<<"\n";
                image1.setPixel(x, y, argb);
                image2.setPixel(x, y, argb);
+
+               image3.setPixel(x,y,5);
+
            }
        }
-    QLabel i2,i1,i3;
 
-    i1.setPixmap(QPixmap::fromImage(i1));
+
+    QLabel i2("<H1>Format_RGB16</H1>"),i1("<H1>Format_ARGB32"),i3;
+
+    i1.setPixmap(QPixmap::fromImage(image1));
     i1.show();
 
-    i2.setPixmap(QPixmap::fromImage(i2));
+    i2.setPixmap(QPixmap::fromImage(image2));
     i2.show();
 
-    return 0;
+    i3.setPixmap(QPixmap::fromImage(image3));
+    i3.show();
+
+    return app.exec();
+}
+
+void  standeviat(int* mas){
+    double sum=0;
+
+    for (int i=0; i<k;i++){
+
+        sum+=mas[i];
+    }
+    mid=sum/k;
+    cout<<"midle\n"<<mid;
+    sum=0;
+    for (int i=0; i<k;i++){
+
+        sum=sum+(mas[i]-mid)*(mas[i]-mid);
+    }
+
+    stdev=sqrt(sum/k-1);
+    return;
 }

@@ -6,10 +6,13 @@
 #include <stdio.h>
 #include <QStringList>
 #include <QString>
+#include <math.h>
 
-//#include <QApplication>
+#include <QApplication>
 #include <QImage>
 #include <QPixmap>
+#include <QLabel>
+#include <QDebug>
 
 //#include <QFileDialog>
 using namespace std; //std::cout;

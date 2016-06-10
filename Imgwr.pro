@@ -4,4 +4,6 @@ HEADERS += \
 SOURCES += \
     main.cpp
 
-#QT += core
+QT += core
+QT -= gui
+QT += widgets
