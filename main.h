@@ -17,4 +17,7 @@
 //#include <QFileDialog>
 using namespace std; //std::cout;
 //using namespace std::cin;
+
+void normalization (int *mas);
+void standeviat    (int* mas);
 #endif // MAIN_H
