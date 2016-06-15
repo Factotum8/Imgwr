@@ -9,6 +9,8 @@ int main (int argc, char** argv){
     QApplication app(argc, argv);
     QFile fileIn("flow"),fileOut("IMG");
 
+     qsrand((unsigned)time(0));
+
     if (!fileIn.open(QIODevice::ReadOnly)) {
         cout<<"Not faund file In\n";
         return 0;
@@ -24,7 +26,7 @@ int main (int argc, char** argv){
 
     QStringList filter;
 
-    filter = list.filter(QRegExp("ifIndex|port|pkts|bytes|pr|masklen"));  //("(^[iosdpbt]{1;1})"); //.*\\d+)");
+    filter =list.filter(QRegExp("ifIndex|port|pkts|bytes|pr|masklen"));  //("(^[iosdpbt]{1;1})"); //.*\\d+)");
 
     QStringList abc;
 
@@ -52,30 +54,36 @@ int main (int argc, char** argv){
         //qDebug()<<values[i];
     }
 
-    int height=36,width=k/height;
+    //int height=150,width=k/height;
+    qDebug()<<"k="<<k<<"\n";
+    int width=0;
+    cin>>width;
+    int height=k/width;
 
-    QImage image1 (width, height, QImage::Format_ARGB32_Premultiplied);
-    QImage image2 (width, height, QImage::Format_RGB32);
-    QImage image3 (width, height, QImage::Format_Mono);
-  //  QImage image4 (width, height, QImage::Format_);
+    QImage image1 (width, height+1, QImage::Format_ARGB32_Premultiplied);
+    QImage image2 (width, height+1, QImage::Format_RGB32);
+    QImage image3 (width, height+1, QImage::Format_Indexed8);
 
     qDebug()<<"\nwidth="<<width<<" height="<<height<<" k="<<k;
 
     normalization(values);
 
-    for (int y = 0; y < height; y++) {
-           for (int x = 0; x < width-2; x++) {
-              /* QRgb argb = qRgb( values[x+y]+10,  // red
-                                 values[x+y+1]+10,  // green
-                                 values[x+y+2]+10); // blue*/
-               QRgb argb = qRgb( values[x+y],  // red
-                                 values[x+y+1],  // green
-                                 values[x+y+2]); // blue
-               //qDebug()<<"\nx="<<x<<" y="<<y<<"     "<<values[x+y]+10<< values[x+y+1]+10<<values[x+y+2]+10<<"\n";
+    for (int y = 0; y <= height; y++) {
+       // cout<<"\ny="<<y<<" ";
+           for (int x = 0; x < width-2; x+=3) {
+               QRgb argb;
+                if (y<height)  {argb = qRgb(
+                                     values[x+y*width],              // red
+                                     values[x+y*width+1],            // green
+                                     values[x+y*width+2]);           // blue
+                 }else {
+                                argb = qRgb( 0xff,  // red
+                                             0xff,  // green
+                                             0xff); // blue
+                 }
                image1.setPixel(x, y, argb);
                image2.setPixel(x, y, argb);
-               //qDebug()<<"pixel x="<<x<<" y="<<y<<"   "<<image2.pixel(x,y);
-               //image3.setPixel(x,y,5);
+               //cout<<" pixel("<<x+y*width<<","<<x+y*width+1<<","<<x+y*width+2<<")";
 
            }
        }
@@ -89,8 +97,15 @@ int main (int argc, char** argv){
     i2.setPixmap(QPixmap::fromImage(image2));
     i2.show();
 
-    //i3.setPixmap(QPixmap::fromImage(image3));
-    //i3.show();
+ /*   for (int y = 0; y < height; y++) {
+           for (int x = 0; x < width; x++) {
+               image3.setPixel(x,y,values[y*width+x]);
+
+           }
+       }
+    QLabel i3;
+    i3.setPixmap(QPixmap::fromImage(image3));
+    i3.show();*/
 
     return app.exec();
 }
