@@ -1,58 +1,36 @@
 #include "main.h"
 
 double mid=0, stdev=0;
-
 int k=0;
+
+QFile fileIn("flow");
+QStringList filter,listv;
 
 int main (int argc, char** argv){
 
     QApplication app(argc, argv);
-    QFile fileIn("flow"),fileOut("IMG");
+    QFile fileOut("IMG");
 
-     qsrand((unsigned)time(0));
+    //qsrand((unsigned)time(0));
 
     if (!fileIn.open(QIODevice::ReadOnly)) {
         cout<<"Not faund file In\n";
         return 0;
     }
-    QStringList list;
 
-    while (!fileIn.atEnd()){
+    QStringList numb,*pnumb=&numb;
 
-        QByteArray  line = fileIn.readLine();
+    regexp_str();
 
-        list<<line;
-    }
+    regexp_numb(pnumb);
 
-    QStringList filter;
+    k= numb.size();
 
-    filter =list.filter(QRegExp("ifIndex|port|pkts|bytes|pr|masklen"));  //("(^[iosdpbt]{1;1})"); //.*\\d+)");
-
-    QStringList abc;
-
-    for (int i=0; i< filter.size(); i++){
-        QRegExp RX ("(\\d+)");
-        int pos=0;
-
-        //cout<<filter.at(i).toStdString()<<"\n";
-
-        while ((pos = RX.indexIn(filter.at(i), pos)) != -1) {
-                  abc<<RX.cap(1);
-                  pos += RX.matchedLength();
-        }
-
-    }
-
-    k= abc.size();
     int values [k];
 
-    qDebug()<<"ABC\n";
-    for (int i=0; i< abc.size(); i++){
+    qDebug()<<"numb\n";
 
-        values [i]=abc.at(i).toInt();
-        //cout <<abc.at(i).toStdString()<<"  ";
-        //qDebug()<<values[i];
-    }
+    init_mas(values,pnumb);
 
     //int height=150,width=k/height;
     qDebug()<<"k="<<k<<"\n";
@@ -106,11 +84,11 @@ int main (int argc, char** argv){
     QLabel i3;
     i3.setPixmap(QPixmap::fromImage(image3));
     i3.show();*/
-
+    fileIn.close();
     return app.exec();
 }
 
-void  standeviat(int* mas){
+void standeviat(int* mas){
     double sum=0;
 
     for (int i=0; i<k;i++){
@@ -143,5 +121,45 @@ void normalization (int *mas){
 
     }
 
+    return;
+}
+
+void regexp_str(){
+    while (!fileIn.atEnd()){
+
+        QByteArray  line = fileIn.readLine();
+
+        filter<<line;
+    }
+
+
+    listv=filter.filter(QRegExp("ifIndex|port|pkts|bytes|pr|masklen"));  //("(^[iosdpbt]{1;1})"); //.*\\d+)");
+}
+
+void regexp_numb(QStringList *pnumb){
+
+    for (int i=0; i< listv.size(); i++){
+        QRegExp RX ("(\\d+)");
+        int pos=0;
+
+        //cout<<filter.at(i).toStdString()<<"\n";
+
+        while ((pos = RX.indexIn(listv.at(i), pos)) != -1) {
+                  *pnumb<<RX.cap(1);
+                  pos += RX.matchedLength();
+        }
+
+    }
+    return;
+}
+
+void init_mas (int *mas,QStringList *pnumb){
+
+    for (int i=0; i< k; i++){
+
+            mas[i]=pnumb->at(i).toInt();
+            //cout <<abc.at(i).toStdString()<<"  ";
+            //qDebug()<<values[i];
+    }
     return;
 }
