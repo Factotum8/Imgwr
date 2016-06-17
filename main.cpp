@@ -35,14 +35,12 @@ int main (int argc, char** argv){
 
     int values [k];
 
-    qDebug()<<"numb\n";
-
     init_mas(values,pnumb);
 
     //int height=150,width=k/height;
     qDebug()<<"k="<<k<<"\n";
     int width=1200;
-    cin>>width;
+    //cin>>width;
     int height=700;
 
     QImage image1 (width, height+1, QImage::Format_ARGB32_Premultiplied);
@@ -80,6 +78,8 @@ int main (int argc, char** argv){
                     values[i+6],              // red
                     values[i],               // green
                     values[i+1]);           // blue
+
+        //qDebug()<<values[i+2]+values[i+3]+values[i+4]<<values[i+5]+values[i+7]+values[i+8];
 
         image1.setPixel(values[i+2]+values[i+3]+values[i+4],values[i+5]+values[i+7]+values[i+8], argb);
         image2.setPixel(values[i+2]+values[i+3]+values[i+4],values[i+5]+values[i+7]+values[i+8], argb);
@@ -190,13 +190,15 @@ void normalization (int *mas){
         dstp_stdev  +=(mas[i+3]-dstp_stdev)*(mas[i+3]-dstp_stdev);
         pkts_stdev  +=(mas[i+4]-pkts_stdev)*(mas[i+4]-pkts_stdev);
         bts_stdev   +=(mas[i+5]-bts_stdev)*(mas[i+5]-bts_stdev);
+        cout<<"\n"<<mas[i+2]<<" "<<mas[i+3]<<" "<<mas[i+4]<<" "<<mas[i+5];
     }
 
     srcp_stdev=sqrt(srcp_stdev/t-1);
     dstp_stdev=sqrt(dstp_stdev/t-1);
     pkts_stdev=sqrt(pkts_stdev/t-1);
     bts_stdev=sqrt (bts_stdev/t-1);
-
+    cout<<"\n stdev ";
+    cout<<srcp_stdev<<" "<<dstp_stdev<<" "<<pkts_stdev;
     return;
 }
 
