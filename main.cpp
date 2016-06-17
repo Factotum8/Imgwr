@@ -1,6 +1,13 @@
 #include "main.h"
 
-double mid=0, stdev=0;
+long double inptIn_stdev=0,outpIn_stdev,srcp_stdev=0,
+               dstp_stdev=0,bts_stdev=0,pkts_stdev=0,
+                 prot_stdev=0,srcmask_stdev=0,dstmask_stdev=0;
+
+long  double inptIn_average=0,outpIn_average,srcp_average=0,
+               dstp_average=0,bts_average=0,pkts_average=0,
+                prot_average=0,srcmask_average=0,dstmask_average=0;
+
 int k=0;
 
 QFile fileIn("flow");
@@ -34,9 +41,9 @@ int main (int argc, char** argv){
 
     //int height=150,width=k/height;
     qDebug()<<"k="<<k<<"\n";
-    int width=0;
+    int width=1200;
     cin>>width;
-    int height=k/width;
+    int height=700;
 
     QImage image1 (width, height+1, QImage::Format_ARGB32_Premultiplied);
     QImage image2 (width, height+1, QImage::Format_RGB32);
@@ -45,8 +52,9 @@ int main (int argc, char** argv){
     qDebug()<<"\nwidth="<<width<<" height="<<height<<" k="<<k;
 
     normalization(values);
+    zcontribution(values);
 
-    for (int y = 0; y <= height; y++) {
+ /*   for (int y = 0; y <= height; y++) {
        // cout<<"\ny="<<y<<" ";
            for (int x = 0; x < width-2; x+=3) {
                QRgb argb;
@@ -64,7 +72,20 @@ int main (int argc, char** argv){
                //cout<<" pixel("<<x+y*width<<","<<x+y*width+1<<","<<x+y*width+2<<")";
 
            }
-       }
+       }*/
+
+    for (int i = 0; i <k; i+=9) {
+        QRgb argb;
+        argb = qRgb(
+                    values[i+6],              // red
+                    values[i],               // green
+                    values[i+1]);           // blue
+
+        image1.setPixel(values[i+2]+values[i+3]+values[i+4],values[i+5]+values[i+7]+values[i+8], argb);
+        image2.setPixel(values[i+2]+values[i+3]+values[i+4],values[i+5]+values[i+7]+values[i+8], argb);
+        //cout<<" pixel("<<x+y*width<<","<<x+y*width+1<<","<<x+y*width+2<<")";
+
+    }
 
     // QLabel i2("<H1>Format_RGB16</H1>"),i1("<H1>Format_ARGB32"),i3;
     QLabel i2,i1,i3;
@@ -88,7 +109,7 @@ int main (int argc, char** argv){
     return app.exec();
 }
 
-void standeviat(int* mas){
+/*void standard_deviation(int* mas){
     double sum=0;
 
     for (int i=0; i<k;i++){
@@ -105,9 +126,9 @@ void standeviat(int* mas){
 
     stdev=sqrt(sum/k-1);
     return;
-}
+}*/
 
-void normalization (int *mas){
+/*void normalization (int *mas){
 
     for (int i=0;i<k;i+=9){
 
@@ -120,6 +141,61 @@ void normalization (int *mas){
         mas[i+6]=(mas[i+6]*254)/142;
 
     }
+
+    return;
+}*/
+
+void zcontribution (int *mas){
+
+    for (int i=0;i<k;i+=9){
+
+        mas[i+2]=((double)mas[i+2]-srcp_average)/srcp_stdev;
+        mas[i+3]=((double)mas[i+3]-dstp_average)/dstp_stdev;
+        mas[i+4]=((double)mas[i+4]-pkts_average)/pkts_stdev;
+        mas[i+5]=((double)mas[i+5]-bts_average)/bts_stdev;
+        mas[i+7]=((double)mas[i+7]-srcmask_average)/srcmask_stdev;
+        mas[i+8]=((double)mas[i+8]-dstmask_average)/dstmask_stdev;
+    }
+
+    return;
+}
+void normalization (int *mas){
+
+    int t=k/9;
+
+    for (int i=0;i<k;i+=9){
+
+        mas[i]=(mas[i]*254)/65535;
+        mas[i+1]=(mas[i+1]*254)/65535;
+        srcp_average+=mas[i+2];
+        dstp_average+=mas[i+3];
+        pkts_average+=mas[i+4];
+        bts_average +=mas[i+5];
+        mas[i+6]=(mas[i+6]*254)/142;
+        srcmask_average+=mas[i+7];
+        dstmask_average+=mas[i+8];
+
+    }
+
+    srcp_average   =srcp_average/t;
+    dstp_average   =dstp_average/t;
+    pkts_average   =pkts_average/t;
+    bts_average    =bts_average/t;
+    srcmask_average=srcmask_average/t;
+    dstmask_average=dstmask_average/t;
+
+    for (int i=0; i<k;i+=9){
+
+        srcp_stdev  +=(mas[i+2]-srcp_average)*(mas[i+2]-srcp_average);
+        dstp_stdev  +=(mas[i+3]-dstp_stdev)*(mas[i+3]-dstp_stdev);
+        pkts_stdev  +=(mas[i+4]-pkts_stdev)*(mas[i+4]-pkts_stdev);
+        bts_stdev   +=(mas[i+5]-bts_stdev)*(mas[i+5]-bts_stdev);
+    }
+
+    srcp_stdev=sqrt(srcp_stdev/t-1);
+    dstp_stdev=sqrt(dstp_stdev/t-1);
+    pkts_stdev=sqrt(pkts_stdev/t-1);
+    bts_stdev=sqrt (bts_stdev/t-1);
 
     return;
 }
