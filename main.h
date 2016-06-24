@@ -13,16 +13,21 @@
 #include <QPixmap>
 #include <QLabel>
 #include <QDebug>
+#include <sstream>
+//#include <cmath>
+#include <math.h>
 
 //#include <QFileDialog>
-using std::cout;
-using std::cin;
+using namespace std;
+//using std::cout;
+//using std::cin;
 
-void normalization (int *mas          );
-void stan_deviat   (int *mas          );
-void init_mas      (int *mas,QStringList *pnumb);
+void normalization (long int *mas          );
+void stan_deviat   (long int *mas          );
+void init_mas      (long int *mas,QStringList *pnumb);
 void regexp_str    (                  );
 void regexp_numb   (QStringList *pnumb);
-void zcontribution (int *mas          );
+void zcontribution (long int *mas          );
+long double Infbit (                  );
 
 #endif // MAIN_H

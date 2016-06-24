@@ -1,22 +1,21 @@
 #include "main.h"
 
-long double inptIn_stdev=0,outpIn_stdev,srcp_stdev=0,
+long long unsigned int inptIn_stdev=0,outpIn_stdev,srcp_stdev=0,
                dstp_stdev=0,bts_stdev=0,pkts_stdev=0,
                  prot_stdev=0,srcmask_stdev=0,dstmask_stdev=0;
 
-long  double inptIn_average=0,outpIn_average,srcp_average=0,
+long long unsigned int inptIn_average=0,outpIn_average,srcp_average=0,
                dstp_average=0,bts_average=0,pkts_average=0,
                 prot_average=0,srcmask_average=0,dstmask_average=0;
 
 int k=0;
 
-QFile fileIn("flow");
+QFile fileIn("flow"), fileOut("IMG");
 QStringList filter,listv;
 
 int main (int argc, char** argv){
 
     QApplication app(argc, argv);
-    QFile fileOut("IMG");
 
     //qsrand((unsigned)time(0));
 
@@ -24,7 +23,6 @@ int main (int argc, char** argv){
         cout<<"Not faund file In\n";
         return 0;
     }
-
     QStringList numb,*pnumb=&numb;
 
     regexp_str();
@@ -33,7 +31,9 @@ int main (int argc, char** argv){
 
     k= numb.size();
 
-    int values [k];
+    long int values [k];
+
+
 
     init_mas(values,pnumb);
 
@@ -71,7 +71,6 @@ int main (int argc, char** argv){
 
            }
        }*/
-
     for (int i = 0; i <k; i+=9) {
         QRgb argb;
         argb = qRgb(
@@ -79,7 +78,9 @@ int main (int argc, char** argv){
                     values[i],               // green
                     values[i+1]);           // blue
 
-        //qDebug()<<values[i+2]+values[i+3]+values[i+4]<<values[i+5]+values[i+7]+values[i+8];
+        //qDebug()<<values[i+2]+values[i+3]+values[i+4]<<"   "<<values[i+5]+values[i+7]+values[i+8];
+
+        qDebug()<<values[i+6]<<"   "<<values[i]<<"   "<<values[+1];
 
         image1.setPixel(values[i+2]+values[i+3]+values[i+4],values[i+5]+values[i+7]+values[i+8], argb);
         image2.setPixel(values[i+2]+values[i+3]+values[i+4],values[i+5]+values[i+7]+values[i+8], argb);
@@ -145,21 +146,30 @@ int main (int argc, char** argv){
     return;
 }*/
 
-void zcontribution (int *mas){
+void zcontribution (long int *mas){
 
     for (int i=0;i<k;i+=9){
+//        //qDebug()<<mas[i+2];
+//        mas[i+2]=abs(mas[i+2]-(long int)srcp_average)*10/srcp_stdev;
+//        //qDebug()<<mas[i+2];
+//        mas[i+3]=((double)mas[i+3]-dstp_average)/dstp_stdev;
+//        mas[i+4]=((double)mas[i+4]-pkts_average)/pkts_stdev;
+//        mas[i+5]=((double)mas[i+5]-bts_average)/bts_stdev;
+//        mas[i+7]=((double)mas[i+7]-srcmask_average)/srcmask_stdev;
+//        mas[i+8]=((double)mas[i+8]-dstmask_average)/dstmask_stdev;
 
-        mas[i+2]=((double)mas[i+2]-srcp_average)/srcp_stdev;
-        mas[i+3]=((double)mas[i+3]-dstp_average)/dstp_stdev;
-        mas[i+4]=((double)mas[i+4]-pkts_average)/pkts_stdev;
-        mas[i+5]=((double)mas[i+5]-bts_average)/bts_stdev;
-        mas[i+7]=((double)mas[i+7]-srcmask_average)/srcmask_stdev;
-        mas[i+8]=((double)mas[i+8]-dstmask_average)/dstmask_stdev;
+               mas[i+2]=abs(mas[i+2]-(long int)srcp_average)*10/srcp_stdev;
+               mas[i+3]=abs(mas[i+3]-(long int)dstp_average)*10/dstp_stdev;
+               mas[i+4]=abs(mas[i+4]-(long int)pkts_average)*10/pkts_stdev;
+               mas[i+5]=abs(mas[i+5]-(long int)bts_average)*10/bts_stdev;
+               mas[i+7]=abs(mas[i+7]-(long int)srcmask_average)*10/(srcmask_stdev+1);
+               mas[i+8]=abs(mas[i+8]-(long int)dstmask_average)*10/(dstmask_stdev+1);
+
     }
 
     return;
 }
-void normalization (int *mas){
+void normalization (long int *mas){
 
     int t=k/9;
 
@@ -190,15 +200,13 @@ void normalization (int *mas){
         dstp_stdev  +=(mas[i+3]-dstp_stdev)*(mas[i+3]-dstp_stdev);
         pkts_stdev  +=(mas[i+4]-pkts_stdev)*(mas[i+4]-pkts_stdev);
         bts_stdev   +=(mas[i+5]-bts_stdev)*(mas[i+5]-bts_stdev);
-        cout<<"\n"<<mas[i+2]<<" "<<mas[i+3]<<" "<<mas[i+4]<<" "<<mas[i+5];
     }
 
     srcp_stdev=sqrt(srcp_stdev/t-1);
     dstp_stdev=sqrt(dstp_stdev/t-1);
     pkts_stdev=sqrt(pkts_stdev/t-1);
     bts_stdev=sqrt (bts_stdev/t-1);
-    cout<<"\n stdev ";
-    cout<<srcp_stdev<<" "<<dstp_stdev<<" "<<pkts_stdev;
+
     return;
 }
 
@@ -210,7 +218,6 @@ void regexp_str(){
         filter<<line;
     }
 
-
     listv=filter.filter(QRegExp("ifIndex|port|pkts|bytes|pr|masklen"));  //("(^[iosdpbt]{1;1})"); //.*\\d+)");
 }
 
@@ -219,8 +226,6 @@ void regexp_numb(QStringList *pnumb){
     for (int i=0; i< listv.size(); i++){
         QRegExp RX ("(\\d+)");
         int pos=0;
-
-        //cout<<filter.at(i).toStdString()<<"\n";
 
         while ((pos = RX.indexIn(listv.at(i), pos)) != -1) {
                   *pnumb<<RX.cap(1);
@@ -231,7 +236,7 @@ void regexp_numb(QStringList *pnumb){
     return;
 }
 
-void init_mas (int *mas,QStringList *pnumb){
+void init_mas (long int *mas,QStringList *pnumb){
 
     for (int i=0; i< k; i++){
 
@@ -241,3 +246,17 @@ void init_mas (int *mas,QStringList *pnumb){
     }
     return;
 }
+
+/*long double Infbit(){
+
+    long double inf=0;
+    void *p=NULL;
+
+    p= new char [sizeof (long double)];
+
+    for (int i=sizeof(inf)-1;i>=0;i--){
+        long double j=0;
+        (i>2)? (inf | ((long double )*p<<j)):(inf |((long double)0<<j));
+    }
+
+    return inf;}*/
