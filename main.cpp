@@ -13,6 +13,18 @@ int k=0;
 QFile fileIn("flow"), fileOut("IMG");
 QStringList filter,listv;
 
+/*
+o input ifIndex
+1 output ifIndex
+2 src port
+3 dst port
+4 pkts
+5 bytes
+6 protocol
+7 src masklen
+8 dst masklen
+*/
+
 int main (int argc, char** argv){
 
     QApplication app(argc, argv);
@@ -71,6 +83,8 @@ int main (int argc, char** argv){
 
            }
        }*/
+    infile(values);
+
     for (int i = 0; i <k; i+=9) {
         QRgb argb;
         argb = qRgb(
@@ -80,7 +94,6 @@ int main (int argc, char** argv){
 
         //qDebug()<<values[i+2]+values[i+3]+values[i+4]<<"   "<<values[i+5]+values[i+7]+values[i+8];
 
-        qDebug()<<values[i+6]<<"   "<<values[i]<<"   "<<values[+1];
 
         image1.setPixel(values[i+2]+values[i+3]+values[i+4],values[i+5]+values[i+7]+values[i+8], argb);
         image2.setPixel(values[i+2]+values[i+3]+values[i+4],values[i+5]+values[i+7]+values[i+8], argb);
@@ -169,7 +182,7 @@ void zcontribution (long int *mas){
 
     return;
 }
-void normalization (long int *mas){
+void preprocesing (long int *mas){
 
     int t=k/9;
 
@@ -186,14 +199,14 @@ void normalization (long int *mas){
         dstmask_average+=mas[i+8];
 
     }
-
+    // average среднее арефметическое
     srcp_average   =srcp_average/t;
     dstp_average   =dstp_average/t;
     pkts_average   =pkts_average/t;
     bts_average    =bts_average/t;
     srcmask_average=srcmask_average/t;
     dstmask_average=dstmask_average/t;
-
+    // stdev стандартное отклонение
     for (int i=0; i<k;i+=9){
 
         srcp_stdev  +=(mas[i+2]-srcp_average)*(mas[i+2]-srcp_average);
@@ -260,3 +273,32 @@ void init_mas (long int *mas,QStringList *pnumb){
     }
 
     return inf;}*/
+
+void infile (long *mas){
+
+    QFile outfile("out");
+
+    if(outfile.open(QIODevice::WriteOnly | QIODevice::Text)){
+
+        cout<<"Can't open file";
+    }
+    QTextStream infile(&outfile);
+
+    for (int i=0;i<k;i+=9){
+        infile<<"FLOW"<<"\n";
+
+        infile<<"input ifIndex:  "<<mas[i]<<"\n";
+        infile<<"output ifIndex: "<<mas[i+1]<<"\n";
+        infile<<"src port:       "<<mas[i+3]<<"\n";
+        infile<<"dst port:       "<<mas[i+4]<<"\n";
+        infile<<"pkts:           "<<mas[i+5]<<"\n";
+        infile<<"bytes:          "<<mas[i+6]<<"\n";
+        infile<<"protocol:       "<<mas[i+7]<<"\n";
+        infile<<"src masklen:    "<<mas[i+8]<<"\n";
+        infile<<"dst masklen:    "<<mas[i+9]<<"\n";
+        infile<<"dst masklen:    "<<mas[i+9]<<"\n";
+
+    }
+
+    outfile.close();
+}

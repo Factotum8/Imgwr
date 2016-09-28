@@ -16,18 +16,23 @@
 #include <sstream>
 //#include <cmath>
 #include <math.h>
+#include <QFile>
+#include <QTextStream>
 
 //#include <QFileDialog>
 using namespace std;
 //using std::cout;
 //using std::cin;
 
-void normalization (long int *mas          );
-void stan_deviat   (long int *mas          );
-void init_mas      (long int *mas,QStringList *pnumb);
+
+void stan_deviat   (long *mas          );
+void  preprocesing (long *mas          );
+void infile(long *mas);
+void init_mas      (long *mas,QStringList *pnumb);
 void regexp_str    (                  );
 void regexp_numb   (QStringList *pnumb);
-void zcontribution (long int *mas          );
+void zcontribution (long *mas          );
 long double Infbit (                  );
+
 
 #endif // MAIN_H
