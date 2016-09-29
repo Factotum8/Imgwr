@@ -1,4 +1,7 @@
 #include "main.h"
+#define    ACCURACY 100
+
+
 
 long long unsigned int inptIn_stdev=0,outpIn_stdev,srcp_stdev=0,
                dstp_stdev=0,bts_stdev=0,pkts_stdev=0,
@@ -61,8 +64,15 @@ int main (int argc, char** argv){
 
     qDebug()<<"\nwidth="<<width<<" height="<<height<<" k="<<k;
 
-    normalization(values);
+    infile(values);
+
+    preprocesing(values);
+
+    infile(values);
+
     zcontribution(values);
+
+    infile(values);
 
  /*   for (int y = 0; y <= height; y++) {
        // cout<<"\ny="<<y<<" ";
@@ -83,7 +93,7 @@ int main (int argc, char** argv){
 
            }
        }*/
-    infile(values);
+
 
     for (int i = 0; i <k; i+=9) {
         QRgb argb;
@@ -185,10 +195,12 @@ void zcontribution (long int *mas){
 void preprocesing (long int *mas){
 
     int t=k/9;
+    double a=0;
 
     for (int i=0;i<k;i+=9){
 
-        mas[i]=(mas[i]*254)/65535;
+        //mas[i]
+        a=round ((double)(mas[i]*254)/65535*ACCURACY)/ACCURACY;
         mas[i+1]=(mas[i+1]*254)/65535;
         srcp_average+=mas[i+2];
         dstp_average+=mas[i+3];
