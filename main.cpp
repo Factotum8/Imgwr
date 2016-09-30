@@ -3,18 +3,6 @@
 
 
 
-long long unsigned int inptIn_stdev=0,outpIn_stdev,srcp_stdev=0,
-               dstp_stdev=0,bts_stdev=0,pkts_stdev=0,
-                 prot_stdev=0,srcmask_stdev=0,dstmask_stdev=0;
-
-long long unsigned int inptIn_average=0,outpIn_average,srcp_average=0,
-               dstp_average=0,bts_average=0,pkts_average=0,
-                prot_average=0,srcmask_average=0,dstmask_average=0;
-
-int k=0;
-
-QFile fileIn("flow"), fileOut("IMG");
-QStringList filter,listv;
 
 /*
 o input ifIndex
@@ -46,7 +34,8 @@ int main (int argc, char** argv){
 
     k= numb.size();
 
-    long int values [k];
+     double values [k];
+
 
 
 
@@ -54,7 +43,7 @@ int main (int argc, char** argv){
 
     //int height=150,width=k/height;
     qDebug()<<"k="<<k<<"\n";
-    int width=1200;
+    int width=1400;
     //cin>>width;
     int height=700;
 
@@ -98,21 +87,24 @@ int main (int argc, char** argv){
     for (int i = 0; i <k; i+=9) {
         QRgb argb;
         argb = qRgb(
-                    values[i+6],              // red
-                    values[i],               // green
-                    values[i+1]);           // blue
+                    round(values[i+6]),              // red
+                    round(values[i]),               // green
+                    round(values[i+1]));           // blue
 
         //qDebug()<<values[i+2]+values[i+3]+values[i+4]<<"   "<<values[i+5]+values[i+7]+values[i+8];
 
 
-        image1.setPixel(values[i+2]+values[i+3]+values[i+4],values[i+5]+values[i+7]+values[i+8], argb);
-        image2.setPixel(values[i+2]+values[i+3]+values[i+4],values[i+5]+values[i+7]+values[i+8], argb);
+        image1.setPixel(round(values[i+2]+values[i+3]+values[i+4]),round(values[i+5]+values[i+7]+values[i+8]), argb);
+        image2.setPixel(round(values[i+2]+values[i+3]+values[i+4]),round(values[i+5]+values[i+7]+values[i+8]), argb);
         //cout<<" pixel("<<x+y*width<<","<<x+y*width+1<<","<<x+y*width+2<<")";
 
     }
 
     // QLabel i2("<H1>Format_RGB16</H1>"),i1("<H1>Format_ARGB32"),i3;
-    QLabel i2,i1,i3;
+    QLabel i2,i1;
+
+    i2.setWindowTitle("Format_RGB16");
+    i1.setWindowTitle("Format_ARGB32");
 
     i1.setPixmap(QPixmap::fromImage(image1));
     i1.show();
@@ -169,48 +161,51 @@ int main (int argc, char** argv){
     return;
 }*/
 
-void zcontribution (long int *mas){
+void zcontribution ( double *mas){
 
     for (int i=0;i<k;i+=9){
-//        //qDebug()<<mas[i+2];
-//        mas[i+2]=abs(mas[i+2]-(long int)srcp_average)*10/srcp_stdev;
-//        //qDebug()<<mas[i+2];
-//        mas[i+3]=((double)mas[i+3]-dstp_average)/dstp_stdev;
-//        mas[i+4]=((double)mas[i+4]-pkts_average)/pkts_stdev;
-//        mas[i+5]=((double)mas[i+5]-bts_average)/bts_stdev;
-//        mas[i+7]=((double)mas[i+7]-srcmask_average)/srcmask_stdev;
-//        mas[i+8]=((double)mas[i+8]-dstmask_average)/dstmask_stdev;
 
-               mas[i+2]=abs(mas[i+2]-(long int)srcp_average)*10/srcp_stdev;
-               mas[i+3]=abs(mas[i+3]-(long int)dstp_average)*10/dstp_stdev;
-               mas[i+4]=abs(mas[i+4]-(long int)pkts_average)*10/pkts_stdev;
-               mas[i+5]=abs(mas[i+5]-(long int)bts_average)*10/bts_stdev;
-               mas[i+7]=abs(mas[i+7]-(long int)srcmask_average)*10/(srcmask_stdev+1);
-               mas[i+8]=abs(mas[i+8]-(long int)dstmask_average)*10/(dstmask_stdev+1);
+        mas[i+2]=abs(mas[i+2]-srcp_average)*10/srcp_stdev;
+        mas[i+3]=abs(mas[i+3]-(long int)dstp_average)*10/dstp_stdev;
+        mas[i+4]=abs(mas[i+4]-(long int)pkts_average)*10/pkts_stdev;
+        mas[i+5]=abs(mas[i+5]-(long int)bts_average)*10/bts_stdev;
+        mas[i+7]=abs(mas[i+7]-(long int)srcmask_average)*10/(srcmask_stdev+1);
+        mas[i+8]=abs(mas[i+8]-(long int)dstmask_average)*10/(dstmask_stdev+1);
 
     }
 
     return;
 }
-void preprocesing (long int *mas){
+void preprocesing ( double *mas){
 
     int t=k/9;
-    double a=0;
-
+    long int s1, s2 ,s3 ,s4,s5,s6,s7,s8,s9;
+    s1=s2=s3=s4=s5=s6=s7=s8=s9=0;
     for (int i=0;i<k;i+=9){
 
-        //mas[i]
-        a=round ((double)(mas[i]*254)/65535*ACCURACY)/ACCURACY;
-        mas[i+1]=(mas[i+1]*254)/65535;
-        srcp_average+=mas[i+2];
-        dstp_average+=mas[i+3];
-        pkts_average+=mas[i+4];
-        bts_average +=mas[i+5];
-        mas[i+6]=(mas[i+6]*254)/142;
-        srcmask_average+=mas[i+7];
-        dstmask_average+=mas[i+8];
+        mas[i]=round ((mas[i]*254)/65535*ACCURACY)/ACCURACY;
+        mas[i+1]=round((mas[i+1]*254)/65535*ACCURACY)/ACCURACY;
+        srcp_average+=round(mas[i+2]*ACCURACY)/ACCURACY;
+        dstp_average+=round(mas[i+3]*ACCURACY)/ACCURACY;
+        pkts_average+=round(mas[i+4]*ACCURACY)/ACCURACY;
+        bts_average +=round(mas[i+5]*ACCURACY)/ACCURACY;
+        mas[i+6]=round((mas[i+6]*254)/142*ACCURACY)/ACCURACY;
+        srcmask_average+=round(mas[i+7]*ACCURACY)/ACCURACY;
+        dstmask_average+=round(mas[i+8]*ACCURACY)/ACCURACY;
+
+        s1+=mas[i];
+        s2+=mas[i+1];
+        s3+=mas[i+2];
+        s4+=mas[i+3];
+        s5+=mas[i+4];
+        s6+=mas[i+5];
+        s7+=mas[i+6];
+        s8+=mas[i+7];
+        s9+=mas[i+8];
 
     }
+
+    cout <<"\n"<<"s0="<<s1<<" s1="<<s2<<" s2="<<srcp_average<<" s3="<<dstp_average<<" s4="<<pkts_average<<" !!!s5="<<bts_average<<" s6="<<s7<<" s7="<<srcmask_average<<" s8="<<dstmask_average;
     // average среднее арефметическое
     srcp_average   =srcp_average/t;
     dstp_average   =dstp_average/t;
@@ -261,7 +256,7 @@ void regexp_numb(QStringList *pnumb){
     return;
 }
 
-void init_mas (long int *mas,QStringList *pnumb){
+void init_mas ( double *mas,QStringList *pnumb){
 
     for (int i=0; i< k; i++){
 
@@ -286,29 +281,29 @@ void init_mas (long int *mas,QStringList *pnumb){
 
     return inf;}*/
 
-void infile (long *mas){
+void infile ( double * mas){
 
     QFile outfile("out");
 
-    if(outfile.open(QIODevice::WriteOnly | QIODevice::Text)){
+    if(!outfile.open(QIODevice::WriteOnly | QIODevice::Text)){
 
-        cout<<"Can't open file";
+        cout<<"Can't open file out data";
     }
     QTextStream infile(&outfile);
 
     for (int i=0;i<k;i+=9){
         infile<<"FLOW"<<"\n";
 
-        infile<<"input ifIndex:  "<<mas[i]<<"\n";
-        infile<<"output ifIndex: "<<mas[i+1]<<"\n";
-        infile<<"src port:       "<<mas[i+3]<<"\n";
-        infile<<"dst port:       "<<mas[i+4]<<"\n";
-        infile<<"pkts:           "<<mas[i+5]<<"\n";
-        infile<<"bytes:          "<<mas[i+6]<<"\n";
-        infile<<"protocol:       "<<mas[i+7]<<"\n";
-        infile<<"src masklen:    "<<mas[i+8]<<"\n";
-        infile<<"dst masklen:    "<<mas[i+9]<<"\n";
-        infile<<"dst masklen:    "<<mas[i+9]<<"\n";
+        infile<<"input ifIndex:  "<<round(mas[i])<<"\n";
+        infile<<"output ifIndex: "<<round(mas[i+1])<<"\n";
+        infile<<"src port:       "<<round(mas[i+3])<<"\n";
+        infile<<"dst port:       "<<round(mas[i+4])<<"\n";
+        infile<<"pkts:           "<<round(mas[i+5])<<"\n";
+        infile<<"bytes:          "<<round(mas[i+6])<<"\n";
+        infile<<"protocol:       "<<round(mas[i+7])<<"\n";
+        infile<<"src masklen:    "<<round(mas[i+8])<<"\n";
+        infile<<"dst masklen:    "<<round(mas[i+9])<<"\n";
+        infile<<"\n";
 
     }
 
