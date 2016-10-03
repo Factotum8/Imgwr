@@ -19,35 +19,21 @@
 #include <cmath>
 #include <QFile>
 #include <QTextStream>
+#include "funct.h"
 
-//#include <QFileDialog>
+
 using namespace std;
-//using std::cout;
-//using std::cin;
-
-
- int inptIn_stdev=0,outpIn_stdev,srcp_stdev=0,
-               dstp_stdev=0,bts_stdev=0,pkts_stdev=0,
-                 prot_stdev=0,srcmask_stdev=0,dstmask_stdev=0;
-
- int inptIn_average=0,outpIn_average,srcp_average=0,
-               dstp_average=0,bts_average=0,pkts_average=0,
-                prot_average=0,srcmask_average=0,dstmask_average=0;
-
-int k=0;
-
-QFile fileIn("flow"), fileOut("IMG");
-QStringList filter,listv;
 
 
 
-void stan_deviat   ( double *mas          );
-void preprocesing  ( double *mas          );
-void infile        ( double *mas          );
-void init_mas      ( double *mas,QStringList *pnumb);
+
+void stan_deviat   ( flow *mas          );
+void preprocesing  ( flow *mas          );
+void infile        ( flow *mas          );
+void init_mas      ( flow *mas,QStringList *pnumb);
 void regexp_str    (                      );
 void regexp_numb   (QStringList *pnumb    );
-void zcontribution (double *mas           );
+void zcontribution (flow *mas           );
 long double Infbit (                      );
 
 

@@ -1,5 +1,6 @@
 HEADERS += \
-    main.h
+    main.h \
+    funct.h
 
 SOURCES += \
     main.cpp
