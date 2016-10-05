@@ -4,52 +4,61 @@
 #define FUNCT_H
 
 #define    ACCURACY 100
+#define    TYPEMETRIC double
 
 using namespace std;
 
-QFile fileIn("flow"), fileOut("IMG");
+QFile       fileIn("flow"), fileOut("IMG");
 QStringList filter,listv;
 
- double inptIn_stdev=0,outpIn_stdev,srcp_stdev=0,
-dstp_stdev=0,bts_stdev=0,pkts_stdev=0,
-prot_stdev=0,srcmask_stdev=0,dstmask_stdev=0;
+struct flow {
 
- double inptIn_average=0,outpIn_average,srcp_average=0,
-dstp_average=0,bts_average=0,pkts_average=0,
-prot_average=0,srcmask_average=0,dstmask_average=0;
+    TYPEMETRIC inptIn;
+    TYPEMETRIC outpIn;
+    TYPEMETRIC srcp;
+    TYPEMETRIC dstp;
+    TYPEMETRIC pkts;
+    TYPEMETRIC bts;
+    TYPEMETRIC prot;
+    TYPEMETRIC srcmask;
+    TYPEMETRIC dstmask;
+
+};
+
+
+flow stdev,average;
 
 int count_numb=0;
 int count_metric=0;
 
-struct flow {
+TYPEMETRIC  norm_65535 (TYPEMETRIC var){
 
-    double inptIn;
-    double outpIn;
-    double srcp;
-    double dstp;
-    double pkts;
-    double bts;
-    double prot;
-    double srcmask;
-    double dstmask;
+    return (round ((var*254)/65535*ACCURACY)/ACCURACY);
 
-};
+}
+
+TYPEMETRIC round_m (TYPEMETRIC var){
+
+    return (round(var*ACCURACY)/ACCURACY);
+
+}
 
 void zcontribution ( flow *mas){
 
     for (int i=0;i<count_metric;i++){
 
-        mas[i].srcp=abs(mas[i].srcp-srcp_average)*10/srcp_stdev;
-        mas[i].dstp=abs(mas[i].dstp-dstp_average)*10/dstp_stdev;
-        mas[i].pkts=abs(mas[i].pkts-pkts_average)*10/pkts_stdev;
-        mas[i].bts=abs(mas[i].bts-bts_average)*10/bts_stdev;
-        mas[i].srcmask=abs(mas[i].srcmask-srcmask_average)*10/(srcmask_stdev+1);
-        mas[i].dstmask=abs(mas[i].dstmask-dstmask_average)*10/(dstmask_stdev+1);
+        mas[i].srcp=abs(mas[i].srcp-average.srcp)*10/stdev.srcp;
+        mas[i].dstp=abs(mas[i].dstp-average.dstp)*10/stdev.dstp;
+        mas[i].pkts=abs(mas[i].pkts-average.pkts)*10/stdev.pkts;
+        mas[i].bts=abs(mas[i].bts-average.bts)*10/stdev.bts;
+        mas[i].srcmask=abs(mas[i].srcmask-average.srcmask)*10/stdev.srcmask;
+        mas[i].dstmask=abs(mas[i].dstmask-average.dstmask)*10/stdev.dstmask;
 
     }
 
     return;
 }
+
 
 void preprocesing ( flow *mas){
 
@@ -59,15 +68,23 @@ void preprocesing ( flow *mas){
 
     for (int i=0;i<count_metric;i++){
 
-        mas[i].inptIn=round ((mas[i].inptIn*254)/65535*ACCURACY)/ACCURACY;
-        mas[i].outpIn=round((mas[i].outpIn*254)/65535*ACCURACY)/ACCURACY;
-        srcp_average+=round(mas[i].srcp*ACCURACY)/ACCURACY;
-        dstp_average+=round(mas[i].dstp*ACCURACY)/ACCURACY;
-        pkts_average+=round(mas[i].pkts*ACCURACY)/ACCURACY;
-        bts_average +=round(mas[i].bts*ACCURACY)/ACCURACY;
-        mas[i].prot=round((mas[i].prot*254)/142*ACCURACY)/ACCURACY;
-        srcmask_average+=round(mas[i].srcmask*ACCURACY)/ACCURACY;
-        dstmask_average+=round(mas[i].dstmask*ACCURACY)/ACCURACY;
+        mas[i].inptIn=norm_65535(mas[i].inptIn);
+
+        mas[i].outpIn=norm_65535(mas[i].outpIn);
+
+        average.srcp+=round_m(mas[i].srcp);
+
+        average.dstp+=round_m(mas[i].dstp);
+
+        average.pkts+=round_m(mas[i].pkts);
+
+        average.bts +=round_m(mas[i].bts);
+
+        mas[i].prot=(round((mas[i].prot*254)/143*ACCURACY)/ACCURACY);
+
+        average.srcmask+=round_m(mas[i].srcmask);
+
+        average.dstmask+=round_m(mas[i].dstmask);
 
         s1+=mas[i].inptIn;
         s2+=mas[i].outpIn;
@@ -81,31 +98,45 @@ void preprocesing ( flow *mas){
 
     }
 
-    qDebug() <<"\n"<<"inptIn="<<s1<<" outpIn="<<s2<<" srcp="<<round(srcp_average)<<" dstp="<<round(dstp_average)<<" pkts="<<pkts_average<<" bts="<<bts_average<<" prot="<<s7<<" srcmask="<<srcmask_average<<" dstmask="<<dstmask_average;
+    average.srcp=round_m( average.srcp);
+    average.dstp=round_m( average.dstp);
+    average.pkts =round_m( average.pkts);
+    average.bts=round_m( average.bts);
+    average.srcmask=round_m( average.srcmask);
+    average.dstmask=round_m( average.dstmask);
+
+
+
+    qDebug() <<"\n"<<"inptIn="<<s1<<" outpIn="<<s2<<" srcp="<<round(average.srcp)<<" dstp="<<round(average.dstp)<<" pkts="
+                    <<average.pkts<<" bts="<<average.bts<<" prot="<<s7<<" srcmask="<<average.srcmask<<" dstmask="<<average.dstmask;
 
     // average среднее арефметическое
 
-    srcp_average   =srcp_average/count_metric;
-    dstp_average   =dstp_average/count_metric;
-    pkts_average   =pkts_average/count_metric;
-    bts_average    =bts_average/count_metric;
-    srcmask_average=srcmask_average/count_metric;
-    dstmask_average=dstmask_average/count_metric;
+    average.srcp        =round_m(average.srcp/count_metric);
+    average.dstp        =round_m(average.dstp/count_metric);
+    average.pkts        =round_m(average.pkts/count_metric);
+    average.bts         =round_m(average.bts/count_metric);
+    average.srcmask     =round_m(average.srcmask/count_metric);
+    average.dstmask     =round_m(average.dstmask/count_metric);
 
     // stdev стандартное отклонение
 
     for (int i=0; i<count_metric;i+=9){
 
-        srcp_stdev  +=(mas[i].srcp-srcp_average)*(mas[i].srcp-srcp_average);
-        dstp_stdev  +=(mas[i].dstp-dstp_stdev)*(mas[i].dstp-dstp_stdev);
-        pkts_stdev  +=(mas[i].pkts-pkts_stdev)*(mas[i].pkts-pkts_stdev);
-        bts_stdev   +=(mas[i].bts-bts_stdev)*(mas[i].bts-bts_stdev);
+        stdev.srcp      +=(mas[i].srcp-average.srcp)*(mas[i].srcp-average.srcp);
+        stdev.dstp      +=(mas[i].dstp-average.dstp)*(mas[i].dstp-average.dstp);
+        stdev.pkts      +=(mas[i].pkts-average.pkts)*(mas[i].pkts-average.pkts);
+        stdev.bts       +=(mas[i].bts-average.bts)*(mas[i].bts-average.bts);
+        stdev.srcmask   +=(mas[i].srcmask-average.srcmask)*(mas[i].srcmask-average.srcmask);
+        stdev.dstmask   +=(mas[i].dstmask-average.dstmask)*(mas[i].dstmask-average.dstmask);
     }
 
-    srcp_stdev=sqrt(srcp_stdev/count_metric-1);
-    dstp_stdev=sqrt(dstp_stdev/count_metric-1);
-    pkts_stdev=sqrt(pkts_stdev/count_metric-1);
-    bts_stdev=sqrt (bts_stdev/count_metric-1);
+    stdev.srcp      =round_m(sqrt(stdev.srcp/count_metric-1));
+    stdev.dstp      =round_m(sqrt(stdev.dstp/count_metric-1));
+    stdev.pkts      =round_m(sqrt(stdev.pkts/count_metric-1));
+    stdev.bts       =round_m(sqrt (stdev.bts/count_metric-1));
+    stdev.dstmask   =round_m(sqrt(stdev.dstmask/count_metric-1));
+    stdev.srcmask   =round_m(sqrt(stdev.srcmask/count_metric-1));
 
     return;
 }
@@ -160,8 +191,7 @@ void init_mas ( flow *mas ,QStringList *pnumb){
         j++;
         mas[i].dstmask=pnumb->at(j).toInt();
         j++;
-        //cout <<abc.at(i).toStdString()<<"  ";
-        //qDebug()<<values[i];
+
     }
     return;
 }
@@ -196,4 +226,7 @@ void infile ( flow* mas){
 
     outfile.close();
 }
+
+
+
 #endif // FUNCT_H

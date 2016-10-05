@@ -25,16 +25,15 @@
 using namespace std;
 
 
+void preprocesing       ( flow *mas                      );
+void infile             ( flow *mas                      );
+void init_mas           ( flow *mas, QStringList *pnumb  );
+void regexp_str         (                                );
+void regexp_numb        ( QStringList *pnumb             );
+void zcontribution      ( flow *mas                      );
 
-
-void stan_deviat   ( flow *mas          );
-void preprocesing  ( flow *mas          );
-void infile        ( flow *mas          );
-void init_mas      ( flow *mas,QStringList *pnumb);
-void regexp_str    (                      );
-void regexp_numb   (QStringList *pnumb    );
-void zcontribution (flow *mas           );
-long double Infbit (                      );
+TYPEMETRIC norm_65535   (TYPEMETRIC var                  );
+TYPEMETRIC round_m      (TYPEMETRIC var                  );
 
 
 #endif // MAIN_H

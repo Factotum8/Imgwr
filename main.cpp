@@ -48,11 +48,8 @@ int main (int argc, char** argv){
 
     qDebug()<<"\nwidth="<<width<<" height="<<height<<" count_numb="<<count_numb<<" count_metric="<<count_metric;
 
-    infile(values);
 
     preprocesing(values);
-
-    infile(values);
 
     zcontribution(values);
 
@@ -84,7 +81,7 @@ int main (int argc, char** argv){
     i1.show();
 
     i2.setPixmap(QPixmap::fromImage(image2));
-    i2.show();
+    //i2.show();
 
 
     fileIn.close();
