@@ -1,0 +1,9 @@
+#!/bin/bash
+
+files =$(ls "$1")
+
+for i in ${files[@]}; do
+
+    ./Imgwr $i 
+
+done

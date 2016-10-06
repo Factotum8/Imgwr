@@ -1,0 +1,12 @@
+#!/bin/bash
+
+files=$(ls "$1")
+ 
+k=0
+
+for i in ${files[@]}; do
+
+    flowdumper "$1/$i" > "./outdir/flow$k"
+    let k++
+
+done
