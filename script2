@@ -2,8 +2,10 @@
 
 files =$(ls "$1")
 
+mkdir $2
+
 for i in ${files[@]}; do
 
-    ./Imgwr $i 
+    ./Imgwr "$1/$i" "$2/$i"
 
 done
