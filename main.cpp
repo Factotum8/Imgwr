@@ -66,8 +66,6 @@ int main (int argc, char** argv){
 
     i1.setPixmap(QPixmap::fromImage(image1));
 
-    qDebug()<<"\nfilenameout "<<outdir+".bmp"<<"\n";
-
     if (!image1.save(outdir+".bmp","BMP")){
 
         cout<<"\nFile image don't save\n";
