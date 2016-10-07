@@ -16,12 +16,15 @@ int main (int argc, char** argv){
 
     QApplication app(argc, argv);
 
-    //qsrand((unsigned)time(0));
+    parsin_input(argc, argv);
+
+    fileIn.setFileName(filename);
 
     if (!fileIn.open(QIODevice::ReadOnly)) {
-        cout<<"Not faund file In\n";
+        cout<<"\nNot found file with flowdump \n";
         return 0;
     }
+
     QStringList numb,*pnumb=&numb;
 
     regexp_str();
@@ -32,9 +35,7 @@ int main (int argc, char** argv){
 
     count_metric=count_numb/9;
 
-    flow values [count_metric];
-
-
+    flow * values =new flow [count_metric];
 
 
     init_mas(values,pnumb);
@@ -43,8 +44,8 @@ int main (int argc, char** argv){
 
     int height=700;
 
-    QImage image1 (width, height+1, QImage::Format_ARGB32_Premultiplied);
-    QImage image2 (width, height+1, QImage::Format_RGB32);
+    QImage image1 (width, height+1, QImage::Format_ARGB32);
+
 
     qDebug()<<"\nwidth="<<width<<" height="<<height<<" count_numb="<<count_numb<<" count_metric="<<count_metric;
 
@@ -52,40 +53,31 @@ int main (int argc, char** argv){
     preprocesing(values);
 
     zcontribution(values);
+/*
+    Записывает значения values в файл flow
 
     infile(values);
+*/
+    setPixel(&image1,values,width,height);
 
+    QLabel i1;
 
-    for (int i = 0; i <count_numb/9; i++) {
-        QRgb argb;
-        argb = qRgb(
-                    round(values[i].bts),              // red
-                    round(values[i].inptIn),           // green
-                    round(values[i].outpIn));          // blue
-
-        //qDebug()<<values[i+2]+values[i+3]+values[i+4]<<"   "<<values[i+5]+values[i+7]+values[i+8];
-
-
-        image1.setPixel(round(values[i].srcp+values[i].dstp+values[i].pkts),round(values[i].prot+values[i].srcmask+values[i].dstmask), argb);
-        image2.setPixel(round(values[i].srcp+values[i].dstp+values[i].pkts),round(values[i].prot+values[i].srcmask+values[i].dstmask), argb);
-        //cout<<" pixel("<<x+y*width<<","<<x+y*width+1<<","<<x+y*width+2<<")";
-
-    }
-
-    QLabel i2,i1;
-
-    i2.setWindowTitle("Format_RGB16");
     i1.setWindowTitle("Format_ARGB32");
 
     i1.setPixmap(QPixmap::fromImage(image1));
-    i1.show();
 
-    i2.setPixmap(QPixmap::fromImage(image2));
-    //i2.show();
+    qDebug()<<"\nfilenameout "<<outdir+".bmp"<<"\n";
 
+    if (!image1.save(outdir+".bmp","BMP")){
+
+        cout<<"\nFile image don't save\n";
+    }
+
+    //i1.show();
 
     fileIn.close();
-    return app.exec();
+    return 0;
+            //app.exec();
 }
 
 

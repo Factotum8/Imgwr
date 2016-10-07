@@ -8,8 +8,9 @@
 
 using namespace std;
 
-QFile       fileIn("flow"), fileOut("IMG");
+QFile       fileIn, fileOut("IMG");
 QStringList filter,listv;
+QString filename,outdir;
 
 struct flow {
 
@@ -72,29 +73,24 @@ void preprocesing ( flow *mas){
 
         mas[i].outpIn=norm_65535(mas[i].outpIn);
 
-        average.srcp+=round_m(mas[i].srcp);
+        average.srcp+=mas[i].srcp;
 
-        average.dstp+=round_m(mas[i].dstp);
+        average.dstp+=mas[i].dstp;
 
-        average.pkts+=round_m(mas[i].pkts);
+        average.pkts+=mas[i].pkts;
 
-        average.bts +=round_m(mas[i].bts);
+        average.bts +=mas[i].bts;
 
-        mas[i].prot=(round((mas[i].prot*254)/143*ACCURACY)/ACCURACY);
+        mas[i].prot=mas[i].prot;   //(round((mas[i].prot*254)/143*ACCURACY)/ACCURACY);
 
-        average.srcmask+=round_m(mas[i].srcmask);
+        average.srcmask+=mas[i].srcmask;
 
-        average.dstmask+=round_m(mas[i].dstmask);
+        average.dstmask+=mas[i].dstmask;
 
         s1+=mas[i].inptIn;
         s2+=mas[i].outpIn;
-        s3+=mas[i].srcp;
-        s4+=mas[i].dstp;
-        s5+=mas[i].pkts;
-        s6+=mas[i].bts;
         s7+=mas[i].prot;
-        s8+=mas[i].srcmask;
-        s9+=mas[i].dstmask;
+
 
     }
 
@@ -227,6 +223,73 @@ void infile ( flow* mas){
     outfile.close();
 }
 
+void usage()
+{
+    cout<<"Вызов: \n [-i имя файла с данными]\n";
+      exit(0);
+}
 
+void parsin_input (int argc, char** argv){
+
+    if (argc==1){
+
+        usage();
+        return;
+    }
+
+    for (int i=1;i<argc;i+=2){
+
+        switch (argv[i][1]) {
+        case 'i':
+                filename=argv[i+1];
+            break;
+        case 'o':
+                outdir=argv[i+1];
+            break;
+        default:
+            filename='flow';
+            break;
+        }
+    }
+
+//    if (exists("./IMG")){
+
+//        if (!mkdir("IMG")){
+
+//            cout<<"\nCan't make directory IMG\n";
+
+//        }
+//    }
+}
+
+void setPixel (QImage *img,flow *values ,int width, int height){
+
+        QRgb argb;
+
+            for (int i=0;i<width;i++){
+
+            for (int j=0;j<height;j++){
+
+                argb= qRgb(
+                           253,     //red
+                           253,     //green
+                           253);    //blue
+
+                img->setPixel(i,j,argb);
+            }
+        }
+
+        for (int i = 0; i <count_numb/9; i++) {
+
+            argb = qRgb(
+                        round(values[i].bts),              // red
+                        round(values[i].inptIn),           // green
+                        round(values[i].outpIn));          // blue
+
+
+            img->setPixel(round(values[i].srcp+values[i].dstp+values[i].pkts),round(values[i].prot+values[i].srcmask+values[i].dstmask), argb);
+
+        }
+}
 
 #endif // FUNCT_H

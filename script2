@@ -1,11 +1,14 @@
 #!/bin/bash
 
-files =$(ls "$1")
+files=$(ls "$1")
 
 mkdir $2
 
-for i in ${files[@]}; do
+k=0
 
-    ./Imgwr "$1/$i" "$2/$i"
+for i in ${files[@]}; do
+    echo "$1/$i"
+    echo "$2/$i$k"
+    ./Imgwr -i "$1/$i" -o "$2/$i$k"
 
 done

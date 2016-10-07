@@ -8,3 +8,7 @@ SOURCES += \
 QT += core
 QT -= gui
 QT += widgets
+
+
+QMAKE_CXXFLAGS_DEBUG += -pg
+QMAKE_LFLAGS_DEBUG += -pg
